@@ -32,6 +32,14 @@ def countIndentations(textLine, indentationMark):
         textLine = textLine[len(indentationMark):]
     return (indentation, textLine)
 
+def extractChapterNumber(line):
+    # assume the chapter number follows this pattern: "Chapter xx: ..."
+    chapterTag = re.search("Chapter \\d+:", line).group()
+    if len(chapterTag) > 0:
+        indexTag = re.search("\\d+", chapterTag).group()
+        if len(indexTag) > 0:
+            return int(indexTag)
+    return 0
 
 # for debug use
 def printChapter(lines):
@@ -60,10 +68,20 @@ def generateSlideChapterTitle(f, line, indent):
     f.write("\n")
 
 
-def generateSlideRegular(f, title, paragraphs, indent):
+def generateSlideRegular(f, title, paragraphs, indent, chIndex, slideIndex):
     f.write(LatexIndentation[indent] + "\\frame {\n")
     indent += 1
     f.write(LatexIndentation[indent] + "\\frametitle{" + title + "}\n")
+
+    # write tags for graphics
+    f.write(LatexIndentation[indent] + "\\begin{figure}\n")
+    indent += 1
+    graphicsName = "Gen{0:02d}_{1:d}".format(chIndex, slideIndex)
+    f.write(LatexIndentation[indent] + "\\includegraphics[width=\\textwidth,height=0.6\\textheight,keepaspectratio]{" + graphicsName + "}\n")
+    indent  -= 1
+    f.write(LatexIndentation[indent] + "\\end{figure}\n")
+
+    # write tags for paragraphs
     f.write(LatexIndentation[indent] + "\\begin{itemize}\n")
     indent += 1
     for para in paragraphs:
@@ -71,6 +89,7 @@ def generateSlideRegular(f, title, paragraphs, indent):
     indent  -= 1
     f.write(LatexIndentation[indent] + "\\end{itemize}\n")
     indent -= 1
+
     f.write(LatexIndentation[indent] + "}\n")
     f.write("\n")
 
@@ -78,6 +97,8 @@ def generateSlideRegular(f, title, paragraphs, indent):
 def processChapter(f, lines, indent):
     slideTitle = ""
     slideParagraphs = []
+    chIndex = 0
+    slideIndex = 0
     for (indentation, line) in lines:
         line = trimTextLine(line)
         if 0 == len(line):
@@ -85,22 +106,24 @@ def processChapter(f, lines, indent):
             continue
         if 0 == indentation:
             # this line is the chapter title
+            chIndex = extractChapterNumber(line)
             generateSlideChapterTitle(f, line, indent)
         elif 1 == indentation:
             # this line is the beginning of a new slide (with slide title)
             if 0 != len(slideTitle):
                 # we have collected slide title and slide paragraphs, now generate the slide
-                generateSlideRegular(f, slideTitle, slideParagraphs, indent)
+                generateSlideRegular(f, slideTitle, slideParagraphs, indent, chIndex, slideIndex)
             # udpate the slide title for the next slide
             slideTitle = line
             # clear the slide paragraphs
             slideParagraphs.clear()
+            slideIndex += 1
         elif 2 == indentation:
             # this line is a paragraph inside a slide
             slideParagraphs.append(line)
     # generate the last slide
     if len(slideTitle) > 0:
-        generateSlideRegular(f, slideTitle, slideParagraphs, indent)
+        generateSlideRegular(f, slideTitle, slideParagraphs, indent, chIndex, slideIndex)
 
 
 def trimTextLine(line):
@@ -165,6 +188,7 @@ with open(args.filename) as fin:
             # this is the beginning of a new chapter.
             # process the current chapter before adding a new text line
             processChapter(fout, chapterLines, texBodyIndent)
+            #printChapter(chapterLines)
             chapterLines.clear()
 
         chapterLines.append((indentation, textLine))
@@ -173,6 +197,7 @@ with open(args.filename) as fin:
 # process the last chapter
 if len(chapterLines) > 0:
     processChapter(fout, chapterLines, texBodyIndent)
+    #printChapter(chapterLines)
 
 
 #fout.write("Hello world!\n")
