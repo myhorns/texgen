@@ -17,6 +17,7 @@ import argparse
 import re
 import os
 import glob
+import copy
 
 LatexIndentation = [
     "",                        # no indentation
@@ -71,32 +72,78 @@ def generateSlideChapterTitle(f, line, indent):
 
 
 def generateSlideRegular(f, title, paragraphs, indent, chIndex, slideIndex):
-    f.write(LatexIndentation[indent] + "\\frame {\n")
-    indent += 1
-    f.write(LatexIndentation[indent] + "\\frametitle{" + title + "}\n")
+    # to ensure there is not too much text on each slide, we set the following limits:
+    # 1. A maximum of **180** characters in the paragraphs, and
+    # 2. No more than two paragraphs. 
+    charLimit = 180
+    paraLimit = 2
 
-    # write tags for graphics
+    subSlidesParagraphics = []
+
+    # check if a graphics file exists for this slide
     graphicsName = "Gen{0:02d}_{1:d}".format(chIndex, slideIndex)
-    # make sure the file exists
-    if graphicsName in allGraphicsFiles:
-        f.write(LatexIndentation[indent] + "\\begin{figure}\n")
+    if graphicsName not in allGraphicsFiles:
+        graphicsName = ""
+
+    if len(graphicsName) == 0:
+        # this is a slide without graphics. the rules defined above does not apply.
+        # simply generate one slide for all paragraphs
+        subSlidesParagraphics.append(paragraphs)
+    else:
+        # devide the paragraphs into multiple sub slides
+        charCount = 0
+        paraCount = 0
+        parasPerSubSlide = []
+        for para in paragraphs:
+            paraLen = len(para)
+            if (paraCount >= paraLimit or charCount + paraLen >= charLimit) and len(parasPerSubSlide) > 0:
+                subSlidesParagraphics.append(copy.deepcopy(parasPerSubSlide))
+                parasPerSubSlide.clear()
+                charCount = 0
+                paraCount = 0
+            else:
+                parasPerSubSlide.append(para)
+                charCount += paraLen
+                paraCount += 1
+        # add the last sub slide
+        if len(parasPerSubSlide) > 0:
+            subSlidesParagraphics.append(parasPerSubSlide)
+
+    # generate the sub slides
+    generateSubSlidesRegular(f, title, graphicsName, subSlidesParagraphics, indent, chIndex, slideIndex)
+
+def generateSubSlidesRegular(f, title, graphicsName, subSlidesParagraphics, indent, chIndex, slideIndex):
+    subSlideTotal = len(subSlidesParagraphics)
+    subSlideIndex = 1
+    titleSuffix = ""
+    for p in subSlidesParagraphics:
+        f.write(LatexIndentation[indent] + "\\frame {\n")
         indent += 1
-        f.write(LatexIndentation[indent] + "\\includegraphics[width=\\textwidth,height=0.6\\textheight,keepaspectratio]{" + graphicsName + "}\n")
+        if subSlideTotal > 1:
+            titleSuffix = " ({0}/{1})".format(subSlideIndex, subSlideTotal)
+        f.write(LatexIndentation[indent] + "\\frametitle{" + title + titleSuffix + "}\n")
+
+        # write tags for graphics
+        if len(graphicsName) > 0:
+            f.write(LatexIndentation[indent] + "\\begin{figure}\n")
+            indent += 1
+            f.write(LatexIndentation[indent] + "\\includegraphics[width=\\textwidth,height=0.6\\textheight,keepaspectratio]{" + graphicsName + "}\n")
+            indent  -= 1
+            f.write(LatexIndentation[indent] + "\\end{figure}\n")
+
+        # write tags for paragraphs
+        f.write(LatexIndentation[indent] + "\\begin{itemize}\n")
+        indent += 1
+        for para in p:
+            f.write(LatexIndentation[indent] + "\\item " + para + "\n")
         indent  -= 1
-        f.write(LatexIndentation[indent] + "\\end{figure}\n")
+        f.write(LatexIndentation[indent] + "\\end{itemize}\n")
+        indent -= 1
 
-    # write tags for paragraphs
-    f.write(LatexIndentation[indent] + "\\begin{itemize}\n")
-    indent += 1
-    for para in paragraphs:
-        f.write(LatexIndentation[indent] + "\\item " + para + "\n")
-    indent  -= 1
-    f.write(LatexIndentation[indent] + "\\end{itemize}\n")
-    indent -= 1
+        f.write(LatexIndentation[indent] + "}\n")
+        f.write("\n")
 
-    f.write(LatexIndentation[indent] + "}\n")
-    f.write("\n")
-
+        subSlideIndex += 1
 
 def processChapter(f, lines, indent):
     slideTitle = ""
