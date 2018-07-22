@@ -63,7 +63,7 @@ def generateSlideChapterTitle(f, line, indent):
     indent += 1
     f.write(LatexIndentation[indent] + "\\begin{LARGE}\n")
     indent += 1
-    f.write(LatexIndentation[indent] + line + "\n")
+    f.write(LatexIndentation[indent] + "\\centerline{" + line + "}\n")
     indent -= 1
     f.write(LatexIndentation[indent] + "\\end{LARGE}\n")
     indent -= 1
@@ -127,7 +127,7 @@ def generateSubSlidesRegular(f, title, graphicsName, subSlidesParagraphics, inde
         if len(graphicsName) > 0:
             f.write(LatexIndentation[indent] + "\\begin{figure}\n")
             indent += 1
-            f.write(LatexIndentation[indent] + "\\includegraphics[width=\\textwidth,height=0.6\\textheight,keepaspectratio]{" + graphicsName + "}\n")
+            f.write(LatexIndentation[indent] + "\\includegraphics[width=1.2\\textwidth,height=0.7\\textheight,keepaspectratio]{" + graphicsName + "}\n")
             indent  -= 1
             f.write(LatexIndentation[indent] + "\\end{figure}\n")
 
@@ -197,6 +197,8 @@ def writeLatexHeading(f):
     f.write("\\usepackage{graphicx}\n")
     f.write("\\graphicspath{{./figures/}}\n")
     f.write("\DeclareGraphicsExtensions{.pdf,.jpg,.jpeg,.png}\n")
+    f.write("\n")
+    f.write("\\setbeamersize{text margin left=4pt, text margin right=4pt}\n")
     f.write("\n")
     f.write("\\title{Genesis}\n")
     f.write("\\subtitle{EBCSV Summer Retreat 2018}\n")

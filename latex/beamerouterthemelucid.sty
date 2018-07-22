@@ -6,14 +6,14 @@
 
 % Frame title
 \defbeamertemplate*{frametitle}{lucid}[1][]{
-  \vskip0.5cm%
-    \begin{beamercolorbox}[wd=\paperwidth,ht=1.2cm]{frametitle} 
+  \vskip0.2cm%
+    \begin{beamercolorbox}[wd=\paperwidth,ht=0.8cm]{frametitle} 
     \begin{tikzpicture}
-    \useasboundingbox(0,0) rectangle(\the\paperwidth,1.2);
+    \useasboundingbox(0,0) rectangle(\the\paperwidth,0.8);
     {\usebeamercolor[fg]{frametitle-left}}
-    \fill[color=frametitle-left.fg] (0.2,0) rectangle(\the\marginedPaperWidth,1.2);
+    \fill[color=frametitle-left.fg] (0.2,0) rectangle(\the\marginedPaperWidth,0.8);
      \ifx\insertframesubtitle\@empty%
-        {\node[anchor=west] at (0.3,0.61){\usebeamerfont{frametitle}\insertframetitle};}
+        {\node[anchor=west] at (0.3,0.41){\usebeamerfont{frametitle}\insertframetitle};}
         \else%
         {\node[anchor= west] at (0.2,0.81){\usebeamerfont{frametitle}\insertframetitle};%
          \node[anchor= west] at (0.4,0.25){\usebeamerfont{framesubtitle}-\insertframesubtitle};}%
