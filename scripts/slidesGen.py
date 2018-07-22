@@ -109,8 +109,40 @@ def generateSlideRegular(f, title, paragraphs, indent, chIndex, slideIndex):
         if len(parasPerSubSlide) > 0:
             subSlidesParagraphics.append(parasPerSubSlide)
 
-    # generate the sub slides
-    generateSubSlidesRegular(f, title, graphicsName, subSlidesParagraphics, indent, chIndex, slideIndex)
+    if 0 == len(graphicsName) and summarySlideKeyword in title:
+        generateSlideSummary(f, title, paragraphs, indent)
+    else:
+        # generate the sub slides
+        generateSubSlidesRegular(f, title, graphicsName, subSlidesParagraphics, indent, chIndex, slideIndex)
+
+
+def generateSlideSummary(f, title, paragraphs, indent):
+    # write a slide with title only (no bullets)
+    f.write(LatexIndentation[indent] + "\\frame {\n")
+    indent += 1
+    f.write(LatexIndentation[indent] + "\\frametitle{" + title + "}\n")
+    indent -= 1
+    f.write(LatexIndentation[indent] + "}\n")
+    f.write("\n")
+
+    # write a new slide with the same title, and bullets to be 
+    # shown one-by-one 
+    f.write(LatexIndentation[indent] + "\\frame {\n")
+    indent += 1
+    f.write(LatexIndentation[indent] + "\\frametitle{" + title + "}\n")
+
+    # write tags for paragraphs
+    f.write(LatexIndentation[indent] + "\\begin{itemize}[<+->]\n")
+    indent += 1
+    for para in paragraphs:
+        f.write(LatexIndentation[indent] + "\\item " + para + "\n")
+    indent  -= 1
+    f.write(LatexIndentation[indent] + "\\end{itemize}\n")
+    indent -= 1
+
+    f.write(LatexIndentation[indent] + "}\n")
+    f.write("\n")
+
 
 def generateSubSlidesRegular(f, title, graphicsName, subSlidesParagraphics, indent, chIndex, slideIndex):
     subSlideTotal = len(subSlidesParagraphics)
@@ -246,6 +278,8 @@ allGraphicsFiles = set()
 collectFiles(glob.glob(graphicsFolder + "*.jpg"))
 collectFiles(glob.glob(graphicsFolder + "*.jpeg"))
 collectFiles(glob.glob(graphicsFolder + "*.png"))
+
+summarySlideKeyword = "Takeaway"
 
 chapterLines = []
 prevIndentation = 0
