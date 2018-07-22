@@ -15,6 +15,8 @@ else:
 
 import argparse
 import re
+import os
+import glob
 
 LatexIndentation = [
     "",                        # no indentation
@@ -74,12 +76,14 @@ def generateSlideRegular(f, title, paragraphs, indent, chIndex, slideIndex):
     f.write(LatexIndentation[indent] + "\\frametitle{" + title + "}\n")
 
     # write tags for graphics
-    f.write(LatexIndentation[indent] + "\\begin{figure}\n")
-    indent += 1
     graphicsName = "Gen{0:02d}_{1:d}".format(chIndex, slideIndex)
-    f.write(LatexIndentation[indent] + "\\includegraphics[width=\\textwidth,height=0.6\\textheight,keepaspectratio]{" + graphicsName + "}\n")
-    indent  -= 1
-    f.write(LatexIndentation[indent] + "\\end{figure}\n")
+    # make sure the file exists
+    if graphicsName in allGraphicsFiles:
+        f.write(LatexIndentation[indent] + "\\begin{figure}\n")
+        indent += 1
+        f.write(LatexIndentation[indent] + "\\includegraphics[width=\\textwidth,height=0.6\\textheight,keepaspectratio]{" + graphicsName + "}\n")
+        indent  -= 1
+        f.write(LatexIndentation[indent] + "\\end{figure}\n")
 
     # write tags for paragraphs
     f.write(LatexIndentation[indent] + "\\begin{itemize}\n")
@@ -157,6 +161,16 @@ def writeLatexHeading(f):
 def writeLatexTailing(f):
     f.write("\\end{document}\n")
 
+# given the path of a file, extract the file name (ignore the 
+# folder name and the extension), then add the file name to a
+# global hash set.
+#   e.g. "figures/Gen01_3.jpg" -> "Gen01_3"
+#   e.g. "figures/Gen01_4.png" -> "Gen01_4"
+def collectFiles(filepaths):
+    for path in filepaths:
+        filename_w_ext = os.path.basename(path)
+        filename, file_extension = os.path.splitext(filename_w_ext)
+        allGraphicsFiles.add(filename)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("filename", type=str,
@@ -173,6 +187,12 @@ args = parser.parse_args()
 fout = open(args.o, 'w')
 writeLatexHeading(fout)
 
+# collect all the graphics files
+graphicsFolder = "figures/"
+allGraphicsFiles = set()
+collectFiles(glob.glob(graphicsFolder + "*.jpg"))
+collectFiles(glob.glob(graphicsFolder + "*.jpeg"))
+collectFiles(glob.glob(graphicsFolder + "*.png"))
 
 chapterLines = []
 prevIndentation = 0
