@@ -194,6 +194,10 @@ def trimTextLine(line):
 def writeLatexHeading(f):
     f.write("\\documentclass{beamer}\n")
     f.write("\n")
+    f.write("\\usepackage{graphicx}\n")
+    f.write("\\graphicspath{{./figures/}}\n")
+    f.write("\DeclareGraphicsExtensions{.pdf,.jpg,.jpeg,.png}\n")
+    f.write("\n")
     f.write("\\title{Genesis}\n")
     f.write("\\subtitle{EBCSV Summer Retreat 2018}\n")
     f.write("\n")
