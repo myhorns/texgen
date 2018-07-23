@@ -124,5 +124,17 @@
                 "-v"
             ]
         },
+        {
+            "name": "Python: Generate Tex",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/scripts/slidesGen.py",
+            "args": [
+                "inputs/Genesis-part-0.txt",
+                "-o",
+                "outputs/output-part-0.tex",
+                "-v"
+            ]
+        }
     ]
 }
