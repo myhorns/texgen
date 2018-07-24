@@ -79,16 +79,21 @@ def generateSlideRegular(f, title, paragraphs, indent, chIndex, slideIndex):
     paraLimit = 2
 
     subSlidesParagraphics = []
+    isSumarySlide = summarySlideKeyword in title
 
-    # check if a graphics file exists for this slide
+    # check if a graphics file exists for this slide.
+    # - a summary slide does not have an image
+    # - a regular slide should have one (and only one) image
+    # - if a graphic name for a regular slide is missing, use a placeholder image instead.
     graphicsName = "Gen{0:02d}_{1:02d}".format(chIndex, slideIndex)
-    if graphicsName not in allGraphicsFiles:
-        graphicsName = ""
+    if not isSumarySlide and graphicsName not in allGraphicsFiles:
+        graphicsName = placeholderGraphicsFile
 
-    if len(graphicsName) == 0:
+    if isSumarySlide:
         # this is a slide without graphics. the rules defined above does not apply.
         # simply generate one slide for all paragraphs
-        subSlidesParagraphics.append(paragraphs)
+        #subSlidesParagraphics.append(paragraphs)
+        generateSlideSummary(f, title, paragraphs, indent)
     else:
         # devide the paragraphs into multiple sub slides
         charCount = 0
@@ -108,11 +113,6 @@ def generateSlideRegular(f, title, paragraphs, indent, chIndex, slideIndex):
         # add the last sub slide
         if len(parasPerSubSlide) > 0:
             subSlidesParagraphics.append(parasPerSubSlide)
-
-    if 0 == len(graphicsName) and summarySlideKeyword in title:
-        generateSlideSummary(f, title, paragraphs, indent)
-    else:
-        # generate the sub slides
         generateSubSlidesRegular(f, title, graphicsName, subSlidesParagraphics, indent, chIndex, slideIndex)
 
 
@@ -281,6 +281,7 @@ collectFiles(glob.glob(graphicsFolder + "*.jpeg"))
 collectFiles(glob.glob(graphicsFolder + "*.png"))
 
 summarySlideKeyword = "Takeaway"
+placeholderGraphicsFile = "placeholder"
 
 chapterLines = []
 prevIndentation = 0
