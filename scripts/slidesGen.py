@@ -220,7 +220,7 @@ def trimTextLine(line):
         #line.rstrip('\n')
 
     # remove anything enclosed by [ ] 
-    return re.sub("\\[.*?\\]", "", line)
+    return re.sub("\\[.*\\]", "", line)
     #return line
 
 
