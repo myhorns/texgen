@@ -81,7 +81,7 @@ def generateSlideRegular(f, title, paragraphs, indent, chIndex, slideIndex):
     subSlidesParagraphics = []
 
     # check if a graphics file exists for this slide
-    graphicsName = "Gen{0:02d}_{1:d}".format(chIndex, slideIndex)
+    graphicsName = "Gen{0:02d}_{1:02d}".format(chIndex, slideIndex)
     if graphicsName not in allGraphicsFiles:
         graphicsName = ""
 
@@ -164,13 +164,14 @@ def generateSubSlidesRegular(f, title, graphicsName, subSlidesParagraphics, inde
             f.write(LatexIndentation[indent] + "\\end{figure}\n")
 
         # write tags for paragraphs
-        f.write(LatexIndentation[indent] + "\\begin{itemize}\n")
-        indent += 1
-        for para in p:
-            f.write(LatexIndentation[indent] + "\\item " + para + "\n")
-        indent  -= 1
-        f.write(LatexIndentation[indent] + "\\end{itemize}\n")
-        indent -= 1
+        if len(p) > 0:
+            f.write(LatexIndentation[indent] + "\\begin{itemize}\n")
+            indent += 1
+            for para in p:
+                f.write(LatexIndentation[indent] + "\\item " + para + "\n")
+            indent  -= 1
+            f.write(LatexIndentation[indent] + "\\end{itemize}\n")
+            indent -= 1
 
         f.write(LatexIndentation[indent] + "}\n")
         f.write("\n")
