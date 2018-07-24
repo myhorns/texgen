@@ -165,13 +165,31 @@ def generateSubSlidesRegular(f, title, graphicsName, subSlidesParagraphics, inde
 
         # write tags for paragraphs
         if len(p) > 0:
+            charCount = 0
+            smallFont = False
+            for para in p:
+                charCount += len(para)
+            if charCount > bulletSmallFontCharLimit:
+                smallFont = True
+            
+            if smallFont:
+                f.write(LatexIndentation[indent] + "\\begin{spacing}{0.8}\n")
+                indent += 1
+
             f.write(LatexIndentation[indent] + "\\begin{itemize}\n")
             indent += 1
             for para in p:
-                f.write(LatexIndentation[indent] + "\\item " + para + "\n")
+                if smallFont:
+                    f.write(LatexIndentation[indent] + "\\item {\\footnotesize " + para + "}\n")
+                else:
+                    f.write(LatexIndentation[indent] + "\\item " + para + "\n")
             indent  -= 1
             f.write(LatexIndentation[indent] + "\\end{itemize}\n")
             indent -= 1
+
+            if smallFont:
+                f.write(LatexIndentation[indent] + "\\end{spacing}\n")
+                indent -= 1
 
         f.write(LatexIndentation[indent] + "}\n")
         f.write("\n")
@@ -219,6 +237,10 @@ def trimTextLine(line):
         line = line[:-1]
         #line.rstrip('\n')
 
+    line = line.replace("“", "\'\'")
+    line = line.replace("”", "\'\'")
+    line = line.replace("\"", "\'\'")
+
     # remove anything enclosed by [ ] 
     return re.sub("\\[.*\\]", "", line).strip()
     #return line
@@ -227,6 +249,7 @@ def trimTextLine(line):
 def writeLatexHeading(f):
     f.write("\\documentclass{beamer}\n")
     f.write("\n")
+    f.write("\\usepackage{setspace}\n")
     f.write("\\usepackage{graphicx}\n")
     f.write("\\graphicspath{{./figures/}}\n")
     f.write("\DeclareGraphicsExtensions{.pdf,.jpg,.jpeg,.png}\n")
@@ -282,6 +305,8 @@ collectFiles(glob.glob(graphicsFolder + "*.png"))
 
 summarySlideKeyword = "Takeaway"
 placeholderGraphicsFile = "placeholder"
+
+bulletSmallFontCharLimit = 150
 
 chapterLines = []
 prevIndentation = 0
