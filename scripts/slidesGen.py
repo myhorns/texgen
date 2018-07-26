@@ -106,10 +106,9 @@ def generateSlideRegular(f, title, paragraphs, indent, chIndex, slideIndex):
                 parasPerSubSlide.clear()
                 charCount = 0
                 paraCount = 0
-            else:
-                parasPerSubSlide.append(para)
-                charCount += paraLen
-                paraCount += 1
+            parasPerSubSlide.append(para)
+            charCount += paraLen
+            paraCount += 1
         # add the last sub slide
         if len(parasPerSubSlide) > 0:
             subSlidesParagraphics.append(parasPerSubSlide)
