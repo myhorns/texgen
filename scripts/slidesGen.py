@@ -239,6 +239,7 @@ def trimTextLine(line):
     line = line.replace("“", "\'\'")
     line = line.replace("”", "\'\'")
     line = line.replace("\"", "\'\'")
+    line = line.replace("’", "'")
 
     # remove anything enclosed by [ ] 
     #
