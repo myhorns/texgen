@@ -241,8 +241,25 @@ def trimTextLine(line):
     line = line.replace("\"", "\'\'")
 
     # remove anything enclosed by [ ] 
-    return re.sub("\\[.*\\]", "", line).strip()
-    #return line
+    #
+    # The greedy regex (which maximize the content enclosed by the brackets) fails
+    # when there are multiple matched brackets in each line. e.g.:
+    # "I want to remove all words in brackets[ like [this] and [[this]] and [[even] this]]. How about [hello world] weeeee".
+    # The greedy regex will return "I want to remove all words in brackets weeeee"
+    #return re.sub("\\[.*\\]", "", line).strip()
+    #
+    # An alternative is to use a conservative regex which minimize the content within brackets, but to
+    # run the regex match/removal repeatly until the match is found
+    condition = True
+    lineLen = len(line)
+    while condition:
+        line = re.sub("\\[[^\\[]*?\\]", "", line)
+        if len(line) != lineLen:
+            lineLen = len(line)
+        else:
+            line = line.strip()
+            condition = False
+    return line
 
 
 def writeLatexHeading(f):
