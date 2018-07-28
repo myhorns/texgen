@@ -35,8 +35,8 @@ def countIndentations(textLine, indentationMark):
         textLine = textLine[len(indentationMark):]
     return (indentation, textLine)
 
-def extractChapterNumber(line):
-    # assume the chapter number follows this pattern: "Chapter xx: ..."
+def extractChapterIndex(line):
+    # assume the chapter index follows this pattern: "Chapter xx: ..."
     chapterTag = re.search("Chapter \\d+:", line).group()
     if len(chapterTag) > 0:
         indexTag = re.search("\\d+", chapterTag).group()
@@ -195,6 +195,10 @@ def generateSubSlidesRegular(f, title, graphicsName, subSlidesParagraphics, inde
 
         subSlideIndex += 1
 
+# params:
+#  f: the file instane
+#  lines: a array of tuples: (indentation, line);
+#  indent: the number of indents to be added to the beginning of each LaTeX output line.
 def processChapter(f, lines, indent):
     slideTitle = ""
     slideParagraphs = []
@@ -207,7 +211,8 @@ def processChapter(f, lines, indent):
             continue
         if 0 == indentation:
             # this line is the chapter title
-            chIndex = extractChapterNumber(line)
+            chIndex = extractChapterIndex(line)
+            # generate a separate slide with chapter name only
             generateSlideChapterTitle(f, line, indent)
         elif 1 == indentation:
             # this line is the beginning of a new slide (with slide title)
@@ -236,6 +241,7 @@ def trimTextLine(line):
         line = line[:-1]
         #line.rstrip('\n')
 
+    # replace non-ascii chars with ascii
     line = line.replace("“", "\'\'")
     line = line.replace("”", "\'\'")
     line = line.replace("\"", "\'\'")
