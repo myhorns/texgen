@@ -46,6 +46,19 @@ def extractChapterIndex(line):
             return int(indexTag)
     return 0
 
+# Apply Latex syntax of boldface to ALLCAPs.
+# ## BUG ALERT ##
+# This method will cause undetermined behavior if the matches form the
+# regex returns duplicated strings.
+def boldfaceAllCaps(str):
+    # regex = \b[A-Z]{2,}\b
+    # \b is word boundary
+    # this matches any A-Z substring whose length is at least 2
+    allcaps = re.findall("\\b[A-Z]{2,}\\b", str)
+    for ac in allcaps:
+        str = str.replace(ac, "\\textbf{" + ac + "}")
+    return str
+
 # for debug use
 def printChapter(lines):
     for (indentation, line) in lines:
@@ -158,6 +171,7 @@ def generateSlideSummary(f, title, paragraphs, indent):
     f.write(LatexIndentation[indent] + "\\begin{itemize}[<+->]\n")
     indent += 1
     for para in paragraphs:
+        para = boldfaceAllCaps(para)
         f.write(LatexIndentation[indent] + "\\item " + para + "\n")
     indent  -= 1
     f.write(LatexIndentation[indent] + "\\end{itemize}\n")
