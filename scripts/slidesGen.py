@@ -302,10 +302,11 @@ def trimTextLine(line):
         #line.rstrip('\n')
 
     # replace non-ascii chars with ascii
-    line = line.replace("“", "\'\'")
-    line = line.replace("”", "\'\'")
-    line = line.replace("\"", "\'\'")
-    line = line.replace("’", "'")
+    line = line.replace("“", "\\textquotedblleft ")  # \textquotedblleft == ``
+    line = line.replace("”", "\\textquotedblright ") # \textquotedblright == ''
+    line = line.replace("‘", "\\textquoteleft ")
+    line = line.replace("’", "\\textquoteright ")
+    line = line.replace("\"", "\\textquotedblright ")
 
     # remove anything enclosed by [ ] 
     #
