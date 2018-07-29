@@ -20,12 +20,14 @@ import glob
 import copy
 
 LatexIndentation = [
-    "",                        # no indentation
-    "    ",                    # 1-stop 
-    "        ",                # 2-stop
-    "            ",            # 3-stop
-    "                ",        # 4-stop
-    "                    "     # 5-stop
+    "",                             # no indentation
+    "    ",                         # 1-stop 
+    "        ",                     # 2-stop
+    "            ",                 # 3-stop
+    "                ",             # 4-stop
+    "                    ",         # 5-stop
+    "                        ",     # 6-stop
+    "                            ", # 7-stop
 ]
 
 def countIndentations(textLine, indentationMark):
@@ -71,14 +73,16 @@ def generateSlideChapterTitle(f, line, indent):
     f.write("\n")
 
 
-def generateSlideRegular(f, title, paragraphs, indent, chIndex, slideIndex):
-    # to ensure there is not too much text on each slide, we set the following limits:
+def generateSlideRegular(f, title, paragraphs, paraSubBullets, indent, chIndex, slideIndex):
+    # to ensure there is not too much text, or too many text lines  on each slide, we set 
+    # the following limits:
     # 1. A maximum of **180** characters in the paragraphs, and
-    # 2. No more than two paragraphs. 
+    # 2. No more than two paragraphs (level-1 bullets).
+    # 3. No more than one level-1 bullet if this one has level-2 bullets. 
     charLimit = 180
     paraLimit = 2
 
-    subSlidesParagraphics = []
+    subSlidesParagraphs = []
     isSumarySlide = summarySlideKeyword in title
 
     # check if a graphics file exists for this slide.
@@ -92,27 +96,47 @@ def generateSlideRegular(f, title, paragraphs, indent, chIndex, slideIndex):
     if isSumarySlide:
         # this is a slide without graphics. the rules defined above does not apply.
         # simply generate one slide for all paragraphs
-        #subSlidesParagraphics.append(paragraphs)
         generateSlideSummary(f, title, paragraphs, indent)
     else:
         # devide the paragraphs into multiple sub slides
         charCount = 0
         paraCount = 0
         parasPerSubSlide = []
-        for para in paragraphs:
-            paraLen = len(para)
-            if (paraCount >= paraLimit or charCount + paraLen >= charLimit) and len(parasPerSubSlide) > 0:
-                subSlidesParagraphics.append(copy.deepcopy(parasPerSubSlide))
+        #for para in paragraphs:
+        for i in range(0, len(paragraphs)):
+            para = paragraphs[i]
+            subBullets = paraSubBullets[i]
+
+            if len(subBullets) > 0:
+                # apply rule #3
+                if len(parasPerSubSlide) > 0: 
+                    # previous left-over paragraphs need to be placed in an 
+                    # individual sub slide.
+                    subSlidesParagraphs.append(copy.deepcopy(parasPerSubSlide))
+                    parasPerSubSlide.clear()
+                # assign a new sub slide to this current paragraph
+                parasPerSubSlide.append((para, subBullets))
+                subSlidesParagraphs.append(copy.deepcopy(parasPerSubSlide))
                 parasPerSubSlide.clear()
                 charCount = 0
                 paraCount = 0
-            parasPerSubSlide.append(para)
-            charCount += paraLen
-            paraCount += 1
+            else:
+                # apply rule #1 & #2
+                paraLen = len(para)
+                for sb in subBullets:
+                    paraLen += len(sb)
+                if (paraCount >= paraLimit or charCount + paraLen >= charLimit) and len(parasPerSubSlide) > 0:
+                    subSlidesParagraphs.append(copy.deepcopy(parasPerSubSlide))
+                    parasPerSubSlide.clear()
+                    charCount = 0
+                    paraCount = 0
+                parasPerSubSlide.append((para, subBullets))
+                charCount += paraLen
+                paraCount += 1
         # add the last sub slide
         if len(parasPerSubSlide) > 0:
-            subSlidesParagraphics.append(parasPerSubSlide)
-        generateSubSlidesRegular(f, title, graphicsName, subSlidesParagraphics, indent, chIndex, slideIndex)
+            subSlidesParagraphs.append(parasPerSubSlide)
+        generateSubSlidesRegular(f, title, graphicsName, subSlidesParagraphs, indent, chIndex, slideIndex)
 
 
 def generateSlideSummary(f, title, paragraphs, indent):
@@ -147,7 +171,7 @@ def generateSubSlidesRegular(f, title, graphicsName, subSlidesParagraphics, inde
     subSlideTotal = len(subSlidesParagraphics)
     subSlideIndex = 1
     titleSuffix = ""
-    for p in subSlidesParagraphics:
+    for subSlideParas in subSlidesParagraphics:
         f.write(LatexIndentation[indent] + "\\frame {\n")
         indent += 1
         if subSlideTotal > 1:
@@ -163,11 +187,19 @@ def generateSubSlidesRegular(f, title, graphicsName, subSlidesParagraphics, inde
             f.write(LatexIndentation[indent] + "\\end{figure}\n")
 
         # write tags for paragraphs
-        if len(p) > 0:
+        if len(subSlideParas) > 0:
             charCount = 0
             smallFont = False
-            for para in p:
+            # apply small font size if:
+            #  1. the total chars in this slide exceeds the limit, or;
+            #  2. there are level-2 bullets in this slide.
+            for (para, subBullets) in subSlideParas:
+                if len(subBullets) > 0:
+                    smallFont = True
+                    break
                 charCount += len(para)
+                for sb in subBullets:
+                    charCount += len(sb)
             if charCount > bulletSmallFontCharLimit:
                 smallFont = True
             
@@ -177,11 +209,23 @@ def generateSubSlidesRegular(f, title, graphicsName, subSlidesParagraphics, inde
 
             f.write(LatexIndentation[indent] + "\\begin{itemize}\n")
             indent += 1
-            for para in p:
-                if smallFont:
-                    f.write(LatexIndentation[indent] + "\\item {\\footnotesize " + para + "}\n")
-                else:
-                    f.write(LatexIndentation[indent] + "\\item " + para + "\n")
+            for (para, subBullets) in subSlideParas:
+                f.write(LatexIndentation[indent] + "\\item " \
+                    + ("{\\footnotesize " if smallFont else "") \
+                    + para \
+                    + ("}\n" if smallFont else "\n"))
+                if len(subBullets) > 0:
+                    indent += 1
+                    f.write(LatexIndentation[indent] + "\\begin{itemize}\n")
+                    indent += 1
+                    for sb in subBullets:
+                        f.write(LatexIndentation[indent] + "\\item " \
+                        + ("{\\scriptsize " if smallFont else "") \
+                        + sb \
+                        + ("}\n" if smallFont else "\n"))
+                    indent -= 1
+                    f.write(LatexIndentation[indent] + "\\end{itemize}\n")
+                    indent -= 1
             indent  -= 1
             f.write(LatexIndentation[indent] + "\\end{itemize}\n")
             indent -= 1
@@ -201,9 +245,12 @@ def generateSubSlidesRegular(f, title, graphicsName, subSlidesParagraphics, inde
 #  indent: the number of indents to be added to the beginning of each LaTeX output line.
 def processChapter(f, lines, indent):
     slideTitle = ""
-    slideParagraphs = []
+    slideParagraphs = []  # this array holds all the level-1 bullet text on a slide
+    subParagraphs = []    # this array holds all the level-2 bullet text of each level-1 text. this array needs to by deep-copied 
+    subBullets = []
     chIndex = 0
     slideIndex = 0
+    prevIndentation = 0
     for (indentation, line) in lines:
         line = trimTextLine(line)
         if 0 == len(line):
@@ -216,20 +263,33 @@ def processChapter(f, lines, indent):
             generateSlideChapterTitle(f, line, indent)
         elif 1 == indentation:
             # this line is the beginning of a new slide (with slide title)
+            if 2 == prevIndentation or 3 == prevIndentation:
+                subParagraphs.append(copy.deepcopy(subBullets))
             if 0 != len(slideTitle):
                 # we have collected slide title and slide paragraphs, now generate the slide
-                generateSlideRegular(f, slideTitle, slideParagraphs, indent, chIndex, slideIndex)
+                generateSlideRegular(f, slideTitle, slideParagraphs, subParagraphs, indent, chIndex, slideIndex)
             # udpate the slide title for the next slide
             slideTitle = line
             # clear the slide paragraphs
             slideParagraphs.clear()
+            subParagraphs.clear()
             slideIndex += 1
         elif 2 == indentation:
             # this line is a paragraph inside a slide
+            if 2 == prevIndentation or 3 == prevIndentation:
+                subParagraphs.append(copy.deepcopy(subBullets))
+            # clear all the level-2 bullets from previous paragraph
+            subBullets.clear()
             slideParagraphs.append(line)
+        elif 3 == indentation:
+            subBullets.append(line)
+
+        prevIndentation = indentation
+
+    subParagraphs.append(copy.deepcopy(subBullets))
     # generate the last slide
     if len(slideTitle) > 0:
-        generateSlideRegular(f, slideTitle, slideParagraphs, indent, chIndex, slideIndex)
+        generateSlideRegular(f, slideTitle, slideParagraphs, subParagraphs, indent, chIndex, slideIndex)
 
 
 def trimTextLine(line):
@@ -275,7 +335,7 @@ def writeLatexHeading(f):
     f.write("\\usepackage{setspace}\n")
     f.write("\\usepackage{graphicx}\n")
     f.write("\\graphicspath{{./figures/}}\n")
-    f.write("\DeclareGraphicsExtensions{.pdf,.jpg,.jpeg,.png}\n")
+    f.write("\\DeclareGraphicsExtensions{.pdf,.jpg,.jpeg,.png}\n")
     f.write("\n")
     f.write("\\setbeamersize{text margin left=4pt, text margin right=4pt}\n")
     f.write("\n")
@@ -356,7 +416,5 @@ if len(chapterLines) > 0:
     processChapter(fout, chapterLines, texBodyIndent)
     #printChapter(chapterLines)
 
-
-#fout.write("Hello world!\n")
 writeLatexTailing(fout)
 fout.close()
