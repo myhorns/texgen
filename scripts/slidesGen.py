@@ -375,10 +375,14 @@ def trimTextLine(line):
     #
     # An alternative is to use a conservative regex which minimize the content within brackets, but to
     # run the regex match/removal repeatly until the match is found
+    #
+    # To better deal with the extra space after brackets removal, the regex was 
+    # refined to include the leading whitespace immediately before the bracket, 
+    # using "\s?": a whitespace appears zero or one time. 
     condition = True
     lineLen = len(line)
     while condition:
-        line = re.sub("\\[[^\\[]*?\\]", "", line)
+        line = re.sub("\\s?\\[[^\\[]*?\\]", "", line)
         if len(line) != lineLen:
             lineLen = len(line)
         else:
