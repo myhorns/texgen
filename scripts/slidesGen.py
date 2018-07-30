@@ -20,14 +20,17 @@ import glob
 import copy
 
 LatexIndentation = [
-    "",                             # no indentation
-    "    ",                         # 1-stop 
-    "        ",                     # 2-stop
-    "            ",                 # 3-stop
-    "                ",             # 4-stop
-    "                    ",         # 5-stop
-    "                        ",     # 6-stop
-    "                            ", # 7-stop
+    "",                                     # no indentation
+    "    ",                                 # 1-stop 
+    "        ",                             # 2-stop
+    "            ",                         # 3-stop
+    "                ",                     # 4-stop
+    "                    ",                 # 5-stop
+    "                        ",             # 6-stop
+    "                            ",         # 7-stop
+    "                                ",     # 8-stop
+    "                                    ", # 9-stop
+    "                                        " # 10-stop
 ]
 
 def countIndentations(textLine, indentationMark):
@@ -224,22 +227,14 @@ def generateSubSlidesRegular(f, title, graphicsName, subSlidesParagraphics, inde
             f.write(LatexIndentation[indent] + "\\begin{itemize}\n")
             indent += 1
             for (para, subBullets) in subSlideParas:
+                # write the level-1 bullets
                 f.write(LatexIndentation[indent] + "\\item " \
                     + ("{\\footnotesize " if smallFont else "") \
                     + para \
                     + ("}\n" if smallFont else "\n"))
                 if len(subBullets) > 0:
-                    indent += 1
-                    f.write(LatexIndentation[indent] + "\\begin{itemize}\n")
-                    indent += 1
-                    for sb in subBullets:
-                        f.write(LatexIndentation[indent] + "\\item " \
-                        + ("{\\scriptsize " if smallFont else "") \
-                        + sb \
-                        + ("}\n" if smallFont else "\n"))
-                    indent -= 1
-                    f.write(LatexIndentation[indent] + "\\end{itemize}\n")
-                    indent -= 1
+                    # write the level-2 bullets
+                    writeLevel2Bullets(f, indent, smallFont, subBullets)
             indent  -= 1
             f.write(LatexIndentation[indent] + "\\end{itemize}\n")
             indent -= 1
@@ -252,6 +247,54 @@ def generateSubSlidesRegular(f, title, graphicsName, subSlidesParagraphics, inde
         f.write("\n")
 
         subSlideIndex += 1
+
+def writeLevel2Bullets(f, indent, smallFont, subBullets):
+    indent += 1
+    f.write(LatexIndentation[indent] + "\\begin{itemize}\n")
+    indent += 1
+
+    singleColumnLinesMax = 3
+    if len(subBullets) <= singleColumnLinesMax:
+        # if the number of level-2 bullet items is less than 3, 
+        # write all the bullets in a single column
+        for sb in subBullets:
+            f.write(LatexIndentation[indent] + "\\item " \
+            + ("{\\scriptsize " if smallFont else "") \
+            + sb \
+            + ("}\n" if smallFont else "\n"))
+    else:
+        # write all the level-2 bullets in two columns
+
+        # the 1st column
+        f.write(LatexIndentation[indent] + "\\begin{minipage}[t]{0.4\\linewidth}\n")
+        indent += 1
+        f.write(LatexIndentation[indent] + "\\vspace{-0.6\\baselineskip}\n")
+        sbIdx = 0
+        while 2 * sbIdx < len(subBullets):
+            f.write(LatexIndentation[indent] + "\\item " \
+                + ("{\\scriptsize " if smallFont else "") \
+                + subBullets[sbIdx] \
+                + ("}\n" if smallFont else "\n"))
+            sbIdx += 1
+        indent -= 1
+        f.write(LatexIndentation[indent] + "\\end{minipage}\n")
+
+        # the 2nd column
+        f.write(LatexIndentation[indent] + "\\begin{minipage}[t]{0.4\\linewidth}\n")
+        indent += 1
+        f.write(LatexIndentation[indent] + "\\vspace{-0.6\\baselineskip}\n")
+        while sbIdx < len(subBullets):
+            f.write(LatexIndentation[indent] + "\\item " \
+                + ("{\\scriptsize " if smallFont else "") \
+                + subBullets[sbIdx] \
+                + ("}\n" if smallFont else "\n"))
+            sbIdx += 1
+        indent -= 1
+        f.write(LatexIndentation[indent] + "\\end{minipage}\n")
+
+    indent -= 1
+    f.write(LatexIndentation[indent] + "\\end{itemize}\n")
+    indent -= 1
 
 # params:
 #  f: the file instane
