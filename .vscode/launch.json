@@ -116,7 +116,7 @@
             "name": "Python: My Debug",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/scripts/slidesGen.py",
+            "program": "${workspaceFolder}/scripts/texgen.py",
             "args": [
                 "scripts/Gen.demo.txt",
                 "-o",
@@ -128,11 +128,11 @@
             "name": "Python: Generate Tex",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/scripts/slidesGen.py",
+            "program": "${workspaceFolder}/scripts/texgen.py",
             "args": [
-                "inputs/Genesis-part-0.txt",
+                "inputs/Genesis_41-50.txt",
                 "-o",
-                "outputs/output-part-0.tex",
+                "latex/Genesis_41-50.tex",
                 "-v"
             ]
         }

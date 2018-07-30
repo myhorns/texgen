@@ -1,6 +1,6 @@
 '''
 Usage: generate the Latex source from an text input file
-    python slidesGen.py input.txt -o output.tex
+    python texgen.py input.txt -o output.tex
 '''
 
 import argparse
