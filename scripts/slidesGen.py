@@ -392,6 +392,7 @@ def trimTextLine(line):
 
 
 def writeLatexHeading(f):
+    indent = 0
     f.write("\\documentclass{beamer}\n")
     f.write("\n")
     f.write("\\usepackage{setspace}\n")
@@ -407,12 +408,30 @@ def writeLatexHeading(f):
     f.write("\\usetheme{lucid}\n")
     f.write("\\begin{document}\n")
     f.write("\n")
-    f.write("    \\frame {\n")
-    f.write("        \\titlepage\n")
-    f.write("    }\n")
+
+    indent += 1
+    f.write(LatexIndentation[indent] + "\\frame {\n")
+    indent += 1
+    f.write(LatexIndentation[indent] +  "\\titlepage\n")
+    indent -= 1
+    f.write(LatexIndentation[indent] + "}\n")
+    indent -= 1
+
     f.write("\n")
 
 def writeLatexTailing(f):
+    indent = 0
+
+    # insert an empty slide at the end of the presentation
+    indent += 1
+    f.write(LatexIndentation[indent] + "\\begin{frame}[plain]\n")
+    indent += 1
+    f.write(LatexIndentation[indent] + "\\centerline{ }\n")
+    indent -= 1
+    f.write(LatexIndentation[indent] + "\\end{frame}\n")
+    indent -= 1
+
+    f.write("\n")
     f.write("\\end{document}\n")
 
 # given the path of a file, extract the file name (ignore the 
