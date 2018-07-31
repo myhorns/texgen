@@ -348,13 +348,6 @@ def trimTextLine(line):
         line = line[:-1]
         #line.rstrip('\n')
 
-    # replace non-ascii chars with ascii
-    line = line.replace("“", "\\textquotedblleft ")  # \textquotedblleft == ``
-    line = line.replace("”", "\\textquotedblright ") # \textquotedblright == ''
-    line = line.replace("‘", "\\textquoteleft ")
-    line = line.replace("’", "\\textquoteright ")
-    line = line.replace("\"", "\\textquotedblright ")
-
     # remove anything enclosed by [ ] 
     #
     # The greedy regex (which maximize the content enclosed by the brackets) fails
@@ -367,17 +360,45 @@ def trimTextLine(line):
     # run the regex match/removal repeatly until the match is found
     #
     # To better deal with the extra space after brackets removal, the regex was 
-    # refined to include the leading whitespace immediately before the bracket, 
-    # using "\s?": a whitespace appears zero or one time. 
-    condition = True
-    lineLen = len(line)
-    while condition:
-        line = re.sub("\\s?\\[[^\\[]*?\\]", "", line)
-        if len(line) != lineLen:
-            lineLen = len(line)
-        else:
-            line = line.strip()
-            condition = False
+    # further refined to be applied in two stages: 
+    # (1) to include the proceeding whitespace if there is an opening quotation 
+    #     mark ahead of the bracket. e.g. 
+    #     "[some words] I will ..." --> "I will ..."
+    #      ------------- 
+    #          MATCH
+    # (2) to include the leading whitespace immediately before the bracket, 
+    #     using "\s?": a whitespace appears zero or one time. e.g.
+    #     "I will [some words] go to ... " --> "I will go to ..."
+    #            -------------
+    #               MATCH
+    # NOTE: stage 1 has to be applied before stage 2 
+
+    # stage 1
+    line = re.sub("\"\[[^\[]*?\]\s", "\"", line)
+    line = re.sub("“\[[^\[]*?\]\s", "“", line)
+    line = re.sub("‘\[[^\[]*?\]\s", "‘", line)
+
+    # stage 2
+    #condition = True
+    #lineLen = len(line)
+    #while condition:
+    #    line = re.sub("\\s?\\[[^\\[]*?\\]", "", line)
+    #    if len(line) != lineLen:
+    #        lineLen = len(line)
+    #    else:
+    #        line = line.strip()
+    #        condition = False
+
+    line = re.sub("\\s?\\[[^\\[]*?\\]", "", line)
+
+    # replace non-ascii chars with ascii
+    line = line.replace("“", "\\textquotedblleft ")  # \textquotedblleft == ``
+    line = line.replace("”", "\\textquotedblright ") # \textquotedblright == ''
+    line = line.replace("‘", "\\textquoteleft ")
+    line = line.replace("’", "\\textquoteright ")
+    #line = line.replace("\"", "\\textquotedblright ")
+    line = line.replace("\"", "\symbol{34}")
+    line = line.replace("'", "\symbol{39}")
     return line
 
 
