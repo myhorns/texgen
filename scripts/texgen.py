@@ -189,7 +189,7 @@ def generateSubSlidesRegular(f, title, graphicsName, subSlidesParagraphics, inde
         if len(graphicsName) > 0:
             f.write(LatexIndentation[indent] + "\\begin{figure}\n")
             indent += 1
-            f.write(LatexIndentation[indent] + "\\includegraphics[width=1.2\\textwidth,height=0.7\\textheight,keepaspectratio]{" + graphicsName + "}\n")
+            f.write(LatexIndentation[indent] + "\\includegraphics[width=1.2\\textwidth,height=0.8\\textheight,keepaspectratio]{" + graphicsName + "}\n")
             indent  -= 1
             f.write(LatexIndentation[indent] + "\\end{figure}\n")
 
@@ -406,10 +406,12 @@ def writeLatexHeading(f):
     indent = 0
     f.write("\\documentclass{beamer}\n")
     f.write("\n")
-    f.write("\\usepackage{setspace}\n")
+    f.write("\\usepackage{setspace}\n")        # to adjust line spacing
     f.write("\\usepackage{graphicx}\n")
     f.write("\\graphicspath{{./figures/}}\n")
     f.write("\\DeclareGraphicsExtensions{.pdf,.jpg,.jpeg,.png}\n")
+    f.write("\n")
+    f.write("\\usepackage[T1]{fontenc}")       # use a narrower font: Computer Modern family
     f.write("\n")
     f.write("\\setbeamersize{text margin left=4pt, text margin right=4pt}\n")
     f.write("\n")
