@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 '''
 Usage: generate the Latex source from an text input file
     python texgen.py input.txt -o output.tex
