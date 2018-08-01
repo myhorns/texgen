@@ -19,6 +19,7 @@ HEIGHT=720
 
 #resize png or jpg to either height or width, keeps proportions using imagemagick
 find . -iname '*.jpg' -exec convert \{} -verbose -quality 82 -resize $HEIGHTx$WIDTH\> \{} \;
+find . -iname '*.jpeg' -exec convert \{} -verbose -quality 82 -resize $HEIGHTx$WIDTH\> \{} \;
 find . -iname '*.png' -exec convert \{} -verbose -resize $HEIGHTx$WIDTH\> \{} \;
 
 #find . -iname '*.jpg' -exec convert \{} -verbose -resize $MAXPIXELS@ \{} \;
