@@ -351,6 +351,9 @@ def trimTextLine(line):
         line = line[:-1]
         #line.rstrip('\n')
 
+    # get rid of non-campatible unicode chars
+    line = line.replace("…", "...")
+
     # remove anything enclosed by [ ] 
     #
     # The greedy regex (which maximize the content enclosed by the brackets) fails
@@ -395,14 +398,14 @@ def trimTextLine(line):
     line = re.sub("\\s?\\[[^\\[]*?\\]", "", line)
 
     # replace non-ascii chars with ascii
-    line = line.replace("“", "\\textquotedblleft ")  # \textquotedblleft == ``
-    line = line.replace("”", "\\textquotedblright ") # \textquotedblright == ''
-    line = line.replace("‘", "\\textquoteleft ")
-    line = line.replace("’", "\\textquoteright ")
+    line = line.replace("“", "{\\textquotedblleft}")  # \textquotedblleft == ``
+    line = line.replace("”", "{\\textquotedblright}") # \textquotedblright == ''
+    line = line.replace("‘", "{\\textquoteleft}")
+    line = line.replace("’", "{\\textquoteright}")
     #line = line.replace("\"", "\\textquotedblright ")
     line = line.replace("\"", "\symbol{34}")
     line = line.replace("'", "\symbol{39}")
-    return line
+    return line.strip()
 
 
 def writeLatexHeading(f):
