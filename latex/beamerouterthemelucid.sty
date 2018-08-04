@@ -28,19 +28,30 @@
 
 \setbeamertemplate{footline}{%
   \begin{minipage}[t]{0.5\paperwidth}
-    \begin{beamercolorbox}[wd=3cm, ht = 1cm]{page number in head/foot}
+    \begin{beamercolorbox}[wd=3cm, ht = 1cm]{institute in head/foot}
       \ifnum\thepage>1\relax%
         \vskip0.2cm%
         \hskip0.3cm%
         \insertpagenumber\,/\,\insertpresentationendpage\kern1em\vskip2pt%
-        \hfill
+        \hfill%
       \fi
     \end{beamercolorbox}
   \end{minipage}
+%  \begin{minipage}[t]{0.76\paperwidth}
+%    \hfill
+%    \begin{beamercolorbox}[wd=3cm, ht = 1cm]{page number in head/foot}
+%      %\logo
+%    \end{beamercolorbox}
+%  \end{minipage}
   \begin{minipage}[t]{0.76\paperwidth}
     \hfill
-    \begin{beamercolorbox}[wd=3cm, ht = 1cm]{page number in head/foot}
-      \logo
+    \begin{beamercolorbox}[wd=4.2cm, ht = 1cm]{institute in head/foot}
+      \ifnum\thepage>1\relax%
+        \vskip0.2cm%
+        \hskip0.3cm%
+        \insertinstitute\kern1em\vskip2pt%
+        \hfill%
+      \fi
     \end{beamercolorbox}
   \end{minipage}
 }
