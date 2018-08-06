@@ -6,11 +6,16 @@
 
 paddingLength=2
 
+
 for fname in *; do
   name="${fname%\.*}"
   extension="${fname#$name}"
   chapter="${name%\.*}"
   slideIdx="${name#$chapter.}"
+
+  # make the file extension lower-case
+  extension=$(echo "$extension" | tr '[:upper:]' '[:lower:]')
+
   # the slideIdx could take value "08" or "09".
   # any number literal starting with '0' but having no 'x' at the 2nd 
   # place is interpreted as octal value
