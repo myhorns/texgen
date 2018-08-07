@@ -43,13 +43,13 @@
 %      %\logo
 %    \end{beamercolorbox}
 %  \end{minipage}
-  \begin{minipage}[t]{0.76\paperwidth}
+  \begin{minipage}[t]{0.80\paperwidth}
     \hfill
-    \begin{beamercolorbox}[wd=4.2cm, ht = 1cm]{institute in head/foot}
+    \begin{beamercolorbox}[wd=4.5cm, ht = 1cm]{institute in head/foot}
       \ifnum\thepage>1\relax%
         \vskip0.2cm%
         \hskip0.3cm%
-        \insertinstitute\kern1em\vskip2pt%
+        \usebeamerfont{institute}\insertinstitute\kern1em\vskip2pt%
         \hfill%
       \fi
     \end{beamercolorbox}

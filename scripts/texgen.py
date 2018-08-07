@@ -85,10 +85,10 @@ def generateSlideChapterTitle(f, line, indent):
 def generateSlideRegular(f, title, paragraphs, paraSubBullets, indent, chIndex, slideIndex):
     # to ensure there is not too much text, or too many text lines  on each slide, we set 
     # the following limits:
-    # 1. A maximum of **180** characters in the paragraphs, and
+    # 1. A maximum of **220** characters in the paragraphs, and
     # 2. No more than two paragraphs (level-1 bullets).
     # 3. No more than one level-1 bullet if this one has level-2 bullets. 
-    charLimit = 180
+    charLimit = 220
     paraLimit = 2
 
     subSlidesParagraphs = []
@@ -192,7 +192,7 @@ def generateSubSlidesRegular(f, title, graphicsName, subSlidesParagraphics, inde
         if len(graphicsName) > 0:
             f.write(LatexIndentation[indent] + "\\begin{figure}\n")
             indent += 1
-            f.write(LatexIndentation[indent] + "\\includegraphics[width=1.2\\textwidth,height=0.8\\textheight,keepaspectratio]{" + graphicsName + "}\n")
+            f.write(LatexIndentation[indent] + "\\includegraphics[width=1.0\\textwidth,height=0.7\\textheight,keepaspectratio]{" + graphicsName + "}\n")
             indent  -= 1
             f.write(LatexIndentation[indent] + "\\end{figure}\n")
 
@@ -412,17 +412,21 @@ def writeLatexHeading(f):
     indent = 0
     f.write("\\documentclass{beamer}\n")
     f.write("\n")
+    f.write("\\geometry{paperwidth=160mm,paperheight=120mm}\n")  # increase paper size (resolution) so that small fonts are still clear
+    f.write("\\n")
     f.write("\\usepackage{setspace}\n")        # to adjust line spacing
     f.write("\\usepackage{graphicx}\n")
     f.write("\\graphicspath{{./figures/}}\n")
     f.write("\\DeclareGraphicsExtensions{.pdf,.jpg,.jpeg,.png}\n")
     f.write("\n")
-    f.write("\\usepackage[T1]{fontenc}")       # use a narrower font: Computer Modern family
+    f.write("\\usepackage[T1]{fontenc}\n")       # use a narrower font: Computer Modern family
+    f.write("\\setbeamerfont{institute}{size=\\tiny}\n")
     f.write("\n")
     f.write("\\setbeamersize{text margin left=4pt, text margin right=4pt}\n")
     f.write("\n")
     f.write("\\title{Genesis}\n")
     f.write("\\subtitle{EBCSV Summer Retreat 2018}\n")
+    f.write("\\institute{Evangel Bible Church of Silicon Valley}\n")
     f.write("\n")
     f.write("\\usetheme{lucid}\n")
     f.write("\\begin{document}\n")
@@ -489,7 +493,7 @@ collectFiles(glob.glob(graphicsFolder + "*.png"))
 summarySlideKeyword = "Takeaway"
 placeholderGraphicsFile = "placeholder"
 
-bulletSmallFontCharLimit = 150
+bulletSmallFontCharLimit = 185
 
 chapterLines = []
 prevIndentation = 0
