@@ -390,12 +390,12 @@ def trimTextLine(line):
     #
     # To better deal with the extra space after brackets removal, the regex was 
     # further refined to be applied in two stages: 
-    # (1) to include the proceeding whitespace if there is an opening quotation 
+    # (1) to include the succeeding whitespace if there is an opening quotation 
     #     mark ahead of the bracket. e.g. 
     #     "[some words] I will ..." --> "I will ..."
     #      ------------- 
     #          MATCH
-    # (2) to include the leading whitespace immediately before the bracket, 
+    # (2) to include the proceeding whitespace immediately before the bracket, 
     #     using "\s?": a whitespace appears zero or one time. e.g.
     #     "I will [some words] go to ... " --> "I will go to ..."
     #            -------------
