@@ -181,6 +181,29 @@ def generateSubSlidesRegular(f, title, graphicsName, subSlidesParagraphics, inde
     subSlideTotal = len(subSlidesParagraphics)
     subSlideIndex = 1
     titleSuffix = ""
+
+    if 0 == len(subSlidesParagraphics):
+        # this is a slide with title and graphics only (no body text)
+        f.write(LatexIndentation[indent] + "\\frame {\n")
+        indent += 1
+        if subSlideTotal > 1:
+            titleSuffix = " ({0}/{1})".format(subSlideIndex, subSlideTotal)
+        f.write(LatexIndentation[indent] + "\\frametitle{" + title + titleSuffix + "}\n")
+
+        # write tags for graphics
+        if len(graphicsName) > 0:
+            f.write(LatexIndentation[indent] + "\\begin{figure}\n")
+            indent += 1
+            f.write(LatexIndentation[indent] + "\\includegraphics[width=1.0\\textwidth,height=0.7\\textheight,keepaspectratio]{" + graphicsName + "}\n")
+            indent  -= 1
+            f.write(LatexIndentation[indent] + "\\end{figure}\n")
+        
+        indent  -= 1
+        f.write(LatexIndentation[indent] + "}\n")
+        f.write("\n")
+        # we're done here
+        return
+
     for subSlideParas in subSlidesParagraphics:
         f.write(LatexIndentation[indent] + "\\frame {\n")
         indent += 1
@@ -413,7 +436,7 @@ def writeLatexHeading(f):
     f.write("\\documentclass{beamer}\n")
     f.write("\n")
     f.write("\\geometry{paperwidth=160mm,paperheight=120mm}\n")  # increase paper size (resolution) so that small fonts are still clear
-    f.write("\\n")
+    f.write("\n")
     f.write("\\usepackage{setspace}\n")        # to adjust line spacing
     f.write("\\usepackage{graphicx}\n")
     f.write("\\graphicspath{{./figures/}}\n")
