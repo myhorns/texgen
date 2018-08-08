@@ -393,32 +393,30 @@ def trimTextLine(line):
     # (1) to include the succeeding whitespace if there is an opening quotation 
     #     mark ahead of the bracket. e.g. 
     #     "[some words] I will ..." --> "I will ..."
-    #      ------------- 
-    #          MATCH
+    #     --------------                - 
+    #          MATCH     -->         REPLACE
     # (2) to include the proceeding whitespace immediately before the bracket, 
     #     using "\s?": a whitespace appears zero or one time. e.g.
     #     "I will [some words] go to ... " --> "I will go to ..."
     #            -------------
-    #               MATCH
+    #               MATCH          -->       DELETED
     # NOTE: stage 1 has to be applied before stage 2 
 
-    # stage 1
-    line = re.sub("\"\[[^\[]*?\]\s", "\"", line)
-    line = re.sub("“\[[^\[]*?\]\s", "“", line)
-    line = re.sub("‘\[[^\[]*?\]\s", "‘", line)
+    condition = True
+    lineLen = len(line)
+    while condition:
+        # stage 1
+        line = re.sub("\"\[[^\[]*?\]\s", "\"", line)
+        line = re.sub("“\[[^\[]*?\]\s", "“", line)
+        line = re.sub("‘\[[^\[]*?\]\s", "‘", line)
+        # stage 2
+        line = re.sub("\\s?\\[[^\\[]*?\\]", "", line)
 
-    # stage 2
-    #condition = True
-    #lineLen = len(line)
-    #while condition:
-    #    line = re.sub("\\s?\\[[^\\[]*?\\]", "", line)
-    #    if len(line) != lineLen:
-    #        lineLen = len(line)
-    #    else:
-    #        line = line.strip()
-    #        condition = False
-
-    line = re.sub("\\s?\\[[^\\[]*?\\]", "", line)
+        if len(line) != lineLen:
+            lineLen = len(line)
+        else:
+            line = line.strip()
+            condition = False
 
     # replace non-ascii chars with ascii
     line = line.replace("“", "{\\textquotedblleft}")  # \textquotedblleft == ``
