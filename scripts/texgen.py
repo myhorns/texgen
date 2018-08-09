@@ -194,7 +194,7 @@ def generateSubSlidesRegular(f, title, graphicsName, subSlidesParagraphics, inde
         if len(graphicsName) > 0:
             f.write(LatexIndentation[indent] + "\\begin{figure}\n")
             indent += 1
-            f.write(LatexIndentation[indent] + "\\includegraphics[width=1.0\\textwidth,height=0.7\\textheight,keepaspectratio]{" + graphicsName + "}\n")
+            f.write(LatexIndentation[indent] + "\\includegraphics[width=1.0\\textwidth,height=0.82\\textheight,keepaspectratio]{" + graphicsName + "}\n")
             indent  -= 1
             f.write(LatexIndentation[indent] + "\\end{figure}\n")
         
@@ -212,27 +212,27 @@ def generateSubSlidesRegular(f, title, graphicsName, subSlidesParagraphics, inde
         f.write(LatexIndentation[indent] + "\\frametitle{" + title + titleSuffix + "}\n")
 
         # the space is devided into two portions:
-        # (1) Upper portion: 75% of textheight is for graphic content (vertically centered)
-        # (2) Lower portion: 25% of textheight is for text (vertically top-aligned)
+        # (1) Upper portion: 82% of textheight is for graphic content (vertically centered)
+        # (2) Lower portion: 18% of textheight is for text (vertically top-aligned)
 
         # write constructs for graphics:
         if len(graphicsName) > 0:
-            # the 1st minipage takes 75% of textheight. 
+            # the 1st minipage takes 82% of textheight. 
             # note the "[c]" is used to instruct the graphics to be "vertically centered"
-            f.write(LatexIndentation[indent] + "\\begin{minipage}[t][0.75\\textheight][c]{1.0\\textwidth}\n")
+            f.write(LatexIndentation[indent] + "\\begin{minipage}[t][0.82\\textheight][c]{1.0\\textwidth}\n")
             indent += 1
+            f.write(LatexIndentation[indent] + "\\vspace{-1.2\\baselineskip}\n")
             f.write(LatexIndentation[indent] + "\\begin{figure}\n")
             indent += 1
-            f.write(LatexIndentation[indent] + "\\includegraphics[width=1.0\\textwidth,height=0.7\\textheight,keepaspectratio]{" + graphicsName + "}\n")
+            f.write(LatexIndentation[indent] + "\\includegraphics[width=1.0\\textwidth,height=0.82\\textheight,keepaspectratio]{" + graphicsName + "}\n")
             indent  -= 1
             f.write(LatexIndentation[indent] + "\\end{figure}\n")
             indent  -= 1
             f.write(LatexIndentation[indent] + "\\end{minipage}\n")
 
         # write tags for paragraphs:
-        # the 1st minipage takes 75% of textheight. 
-        # note the "[c]" is used to instruct the graphics to be "vertically centered"
-        f.write(LatexIndentation[indent] + "\\begin{minipage}[t][0.25\\textheight][t]{1.0\\textwidth}\n")
+        # the 2nd minipage takes 18% of textheight. 
+        f.write(LatexIndentation[indent] + "\\begin{minipage}[t][0.18\\textheight][t]{1.0\\textwidth}\n")
         indent += 1
         if len(subSlideParas) > 0:
             charCount = 0
