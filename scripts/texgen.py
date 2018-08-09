@@ -89,7 +89,7 @@ def generateSlideRegular(f, title, paragraphs, paraSubBullets, indent, chIndex, 
     # 2. No more than two paragraphs (level-1 bullets).
     # 3. No more than one level-1 bullet if this one has level-2 bullets. 
     charLimit = 220
-    paraLimit = 2
+    paraLimit = 1
 
     subSlidesParagraphs = []
     isSumarySlide = summarySlideKeyword in title
