@@ -211,15 +211,29 @@ def generateSubSlidesRegular(f, title, graphicsName, subSlidesParagraphics, inde
             titleSuffix = " ({0}/{1})".format(subSlideIndex, subSlideTotal)
         f.write(LatexIndentation[indent] + "\\frametitle{" + title + titleSuffix + "}\n")
 
-        # write tags for graphics
+        # the space is devided into two portions:
+        # (1) Upper portion: 75% of textheight is for graphic content (vertically centered)
+        # (2) Lower portion: 25% of textheight is for text (vertically top-aligned)
+
+        # write constructs for graphics:
         if len(graphicsName) > 0:
+            # the 1st minipage takes 75% of textheight. 
+            # note the "[c]" is used to instruct the graphics to be "vertically centered"
+            f.write(LatexIndentation[indent] + "\\begin{minipage}[t][0.75\\textheight][c]{1.0\\textwidth}\n")
+            indent += 1
             f.write(LatexIndentation[indent] + "\\begin{figure}\n")
             indent += 1
             f.write(LatexIndentation[indent] + "\\includegraphics[width=1.0\\textwidth,height=0.7\\textheight,keepaspectratio]{" + graphicsName + "}\n")
             indent  -= 1
             f.write(LatexIndentation[indent] + "\\end{figure}\n")
+            indent  -= 1
+            f.write(LatexIndentation[indent] + "\\end{minipage}\n")
 
-        # write tags for paragraphs
+        # write tags for paragraphs:
+        # the 1st minipage takes 75% of textheight. 
+        # note the "[c]" is used to instruct the graphics to be "vertically centered"
+        f.write(LatexIndentation[indent] + "\\begin{minipage}[t][0.25\\textheight][t]{1.0\\textwidth}\n")
+        indent += 1
         if len(subSlideParas) > 0:
             charCount = 0
             smallFont = False
@@ -253,11 +267,15 @@ def generateSubSlidesRegular(f, title, graphicsName, subSlidesParagraphics, inde
                     writeLevel2Bullets(f, indent, smallFont, subBullets)
             indent  -= 1
             f.write(LatexIndentation[indent] + "\\end{itemize}\n")
-            indent -= 1
 
             if smallFont:
                 f.write(LatexIndentation[indent] + "\\end{spacing}\n")
                 indent -= 1
+
+        f.write(LatexIndentation[indent] + "\\vfill\n")
+        indent -= 1
+        f.write(LatexIndentation[indent] + "\\end{minipage}\n")
+        indent -= 1
 
         f.write(LatexIndentation[indent] + "}\n")
         f.write("\n")
